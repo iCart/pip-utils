@@ -226,12 +226,6 @@ class ListCommand(object):
         for dist, latest_version, typ in latest_versions:
             if latest_version > dist.parsed_version:
 
-                if options.update and not options.pinned:
-                    print(dist.project_name if options.brief else
-                          'Updating %s to Latest: %s [%s]' %
-                          (cls.output_package(dist), latest_version, typ))
-                    pip.main(['install', '--upgrade', dist.key])
-
                 if options.all:
                     pass
                 elif options.pinned:
@@ -240,6 +234,12 @@ class ListCommand(object):
                 elif not options.pinned:
                     if not cls.can_be_updated(dist, latest_version):
                         continue
+
+                if options.update and not options.pinned:
+                    print(dist.project_name if options.brief else
+                          'Updating %s to Latest: %s [%s]' %
+                          (cls.output_package(dist), latest_version, typ))
+                    pip.main(['install', '--upgrade'] + (['--user'] if ENABLE_USER_SITE else []) +[dist.key])
 
                 if not options.update:
                     print(dist.project_name if options.brief else
